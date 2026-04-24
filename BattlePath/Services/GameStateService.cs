@@ -38,7 +38,7 @@ namespace BattlePath.Services
             PlayerY = 0;
             Enemies.Clear();
             Waters.Clear();
-            numEnemies += Math.Min((depth), 15);
+           // numEnemies += Math.Min((depth), 15);
             //place enemies randomly
             while (Enemies.Count < numEnemies)
             {
@@ -108,32 +108,24 @@ namespace BattlePath.Services
 
                 if (space < 5)
                 {
-                    if (e.Y < PlayerY)
+                    int dx = PlayerX - e.X;
+                    int dy = PlayerY - e.Y;
+
+                    if (Math.Abs(dx) > Math.Abs(dy))
                     {
-                        test.X = e.X; test.Y = e.Y+ 1;
-                        if (IsBlocked(test)) continue;
-                        e.Y++;
-                    }
-                    else if (e.Y == PlayerY) 
-                    {
-                        if(e.X < PlayerX)
-                        {
-                            test.X = e.X + 1; test.Y = e.Y;
-                            if (IsBlocked(test)) continue;
-                            e.X++;
-                        }else
-                        {
-                            test.X = e.X - 1; test.Y = e.Y;
-                            if (IsBlocked(test)) continue;
-                            e.X--;
-                        }
+                        test.X = e.X + Math.Sign(dx);
+                        test.Y = e.Y;
                     }
                     else
                     {
-                        test.X = e.X; test.Y = e.Y - 1;
-                        if (IsBlocked(test)) continue;
-                        e.Y--;
+                        test.X = e.X;
+                        test.Y = e.Y + Math.Sign(dy);
                     }
+
+                    if (IsBlocked(test))  continue;
+
+                    e.X = test.X;
+                    e.Y = test.Y;
                 }
 
             }
