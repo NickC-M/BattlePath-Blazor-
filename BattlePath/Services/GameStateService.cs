@@ -23,7 +23,7 @@ namespace BattlePath.Services
 
         private Random rng = new Random();
 
-        private int numEnemies = 6;
+        private int numEnemies = 9;
 
         public bool InCombat { get; set; } = false;
 
@@ -52,7 +52,7 @@ namespace BattlePath.Services
                 }
             }
             //place water randomly
-            while (Waters.Count < 14)
+            while (Waters.Count < 20)
             {
                 int wx = rng.Next(GridWidth);
                 int wy = rng.Next(GridHeight);
@@ -79,7 +79,7 @@ namespace BattlePath.Services
 
         public bool MovePlayer(int dx, int dy)
         {
-            MoveEnemies();
+            
  
             int nx = PlayerX + dx;
             int ny = PlayerY + dy;
@@ -89,7 +89,7 @@ namespace BattlePath.Services
 
             PlayerX = nx;
             PlayerY = ny;
-            
+            MoveEnemies();
             return true;
         }
 

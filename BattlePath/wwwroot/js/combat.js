@@ -27,11 +27,11 @@
         }
         //draw player on left
         if (this.playerImg.complete)
-            ctx.drawImage(this.playerImg, 150, 150, 160, 160);
+            ctx.drawImage(this.playerImg, 200, 400, 240, 240);
 
         //draw enemy on right
         if (this.enemyImg.complete)
-            ctx.drawImage(this.enemyImg, 500, 150, 120, 120);
+            ctx.drawImage(this.enemyImg, 700, 400, 160, 160);
 
     },
 
@@ -47,7 +47,7 @@
 
             //draw red flash over enemy
             ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-            ctx.fillRect(500, 150, 120, 120);
+            ctx.fillRect(700, 400, 160, 160);
 
             //after 200ms restore combat canvas
             setTimeout(() => {
@@ -74,9 +74,9 @@
             //save the current canvas
             ctx.save();
 
-            //draw red flash over enemy
+            //draw red flash over player
             ctx.fillStyle = 'rgba(255, 0, 0, 0.5)';
-            ctx.fillRect(150, 150, 160, 160);
+            ctx.fillRect(200, 400, 240, 240);
 
             //after 200ms restore combat canvas
             setTimeout(() => {
