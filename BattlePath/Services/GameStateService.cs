@@ -1,5 +1,6 @@
 ﻿using BattlePath.Models;
 using Microsoft.CodeAnalysis.Differencing;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace BattlePath.Services
 {
@@ -110,7 +111,7 @@ namespace BattlePath.Services
                     if (e.Y < PlayerY)
                     {
                         test.X = e.X; test.Y = e.Y+ 1;
-                        if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
+                        if (IsBlocked(test)) continue;
                         e.Y++;
                     }
                     else if (e.Y == PlayerY) 
@@ -118,19 +119,19 @@ namespace BattlePath.Services
                         if(e.X < PlayerX)
                         {
                             test.X = e.X + 1; test.Y = e.Y;
-                            if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
+                            if (IsBlocked(test)) continue;
                             e.X++;
                         }else
                         {
                             test.X = e.X - 1; test.Y = e.Y;
-                            if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
+                            if (IsBlocked(test)) continue;
                             e.X--;
                         }
                     }
                     else
                     {
                         test.X = e.X; test.Y = e.Y - 1;
-                        if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
+                        if (IsBlocked(test)) continue;
                         e.Y--;
                     }
                 }
@@ -146,6 +147,11 @@ namespace BattlePath.Services
         public bool IsPlayerHere(Position e) => e.X == PlayerX && e.Y == PlayerY;
         public bool IsWaterHere() => Waters.Any(w => w.X == PlayerX && w.Y == PlayerY);
         public bool IsWaterHere(Position wa) => Waters.Any(w => w.X == wa.X && w.Y == wa.Y);
+
+        private bool IsBlocked(Position p)
+        {
+            return (IsEnemyHere(p) || IsExitHere(p) || IsPlayerHere(p) || IsWaterHere(p));
+        }
         public void StartCombat()
         {
             EnemyHealth = 50;
