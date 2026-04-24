@@ -34,16 +34,58 @@ else
 {
     <h3>!Combat!</h3>
     //combat GUI
-    <div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-        <canvas id="combatCanvas" width="1200" height="720" style="border:1px solid black;"></canvas>
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+
+        <!-- LEFT: COMBAT CANVAS -->
+        <div>
+            <canvas id="combatCanvas" width="1200" height="720" style="border:1px solid black;"></canvas>
+
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <h2 style=" text-align: left">Player HP: <span class="badge badge-success">@GameState.PlayerHealth</span></h2>
-            <h2 style=" text-align: right">Enemy HP: <span class="badge badge-danger">@GameState.EnemyHealth</span></h2>
+
+        <!-- RIGHT: HUD PANEL -->
+        <div style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
+
+            <!-- PLAYER PANEL -->
+            <div class="card p-2">
+                <h5>Player</h5>
+
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success"
+                         style="width:@GameState.PlayerHealth%">
+                        @GameState.PlayerHealth
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <div>Attack: @GameState.PlayerAttack</div>
+                    <div>Floor: @GameState.depth</div>
+                </div>
+            </div>
+
+            <!-- ENEMY PANEL -->
+            <div class="card p-2">
+                <h5>Enemy</h5>
+
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-danger"
+                         style="width:@GameState.EnemyHealth%">
+                        @GameState.EnemyHealth
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <div>Attack: 5</div> <!--placeholders-->
+                    <div>Status: Aggressive</div> <!--placeholders-->
+                </div>
+            </div>
+
+            
+            <div style="margin-top: 10px;">
+                <button @onclick="Attack">Attack</button>
+                <button @onclick="Run">Run</button>
+            </div>
+
         </div>
-        <button @onclick="Attack">Attack</button>
-        <button @onclick="Run">Run</button>
     </div>
 }
 
@@ -159,9 +201,10 @@ else
 
     private async Task EnemyTurn()
     {
-        GameState.PlayerHealth -= 5;
+        
         //animation placeholder
         await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
+        GameState.PlayerHealth -= 5;
         if(GameState.PlayerHealth <= 0)
         {
 
