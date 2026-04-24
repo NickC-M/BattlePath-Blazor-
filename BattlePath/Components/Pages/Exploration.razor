@@ -4,17 +4,22 @@
 @inject GameStateService GameState
 @inject IJSRuntime JS
 @inject NavigationManager Nav
-<h3>Exploration</h3>
 
 
+<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
 
 
 
 @if (!GameState.InCombat)
 {
+    
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h2 style=" text-align: left">Exploration  </h2>
+        <h2 style=" text-align: right">Floor: <span class="badge badge-warning">@GameState.depth</span></h2>
+    </div>
     //exploration canvas
-    <canvas id="exploreCanvas" width="400" height="400" style="border:2px solid black;"></canvas>
+    <canvas id="exploreCanvas" width="1200" height="800" style="border:2px solid black;"></canvas>
 
     <p>Use buttons or WASD keys to move the player:</p>
     <div>
@@ -26,12 +31,16 @@
 }
 else
 {
+    <h3>!Combat!</h3>
     //combat GUI
     <div>
-        <h4>Combat!</h4>
-        <canvas id="combatCanvas" width="720" height="360" style="border:1px solid black;"></canvas>
-        <p>Player HP: @GameState.PlayerHealth</p>
-        <p>Enemy HP: @GameState.EnemyHealth</p>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+        <canvas id="combatCanvas" width="1200" height="720" style="border:1px solid black;"></canvas>
+        </div>
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h2 style=" text-align: left">Player HP: <span class="badge badge-success">@GameState.PlayerHealth</span></h2>
+            <h2 style=" text-align: right">Enemy HP: <span class="badge badge-danger">@GameState.EnemyHealth</span></h2>
+        </div>
         <button @onclick="Attack">Attack</button>
         <button @onclick="Run">Run</button>
     </div>
@@ -127,6 +136,8 @@ else
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
             await DrawScene();
         }
+        
+        await EnemyTurn();
 
         await DrawScene();
     }
@@ -137,5 +148,17 @@ else
         await Move(0, -1);
 
         await DrawScene();
+    }
+
+    private async Task EnemyTurn()
+    {
+        GameState.PlayerHealth -= 5;
+        //animation placeholder
+        await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
+        if(GameState.PlayerHealth <= 0)
+        {
+            GameState.EndCombat();
+            
+        }
     }
 }

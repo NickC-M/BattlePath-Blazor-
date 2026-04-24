@@ -9,8 +9,8 @@ namespace BattlePath.Services
         public int PlayerAttack { get; set; } = 10;
         public int EnemyHealth { get; set; } = 50;
 
-        public int GridWidth { get; set; } = 8;
-        public int GridHeight { get; set; } = 8;
+        public int GridWidth { get; set; } = 14;
+        public int GridHeight { get; set; } = 12;
 
         public int PlayerX { get; set; }
         public int PlayerY { get; set; }
@@ -26,15 +26,18 @@ namespace BattlePath.Services
 
         public bool InCombat { get; set; } = false;
 
+        public int depth { get; set; } = 0;
+
 
         //create a new room
         public void GenerateRoom()
         {
+            depth++;
             PlayerX = 0;
             PlayerY = 0;
             Enemies.Clear();
             Waters.Clear();
-
+            numEnemies += Math.Min((depth), 15);
             //place enemies randomly
             while (Enemies.Count < numEnemies)
             {
@@ -48,7 +51,7 @@ namespace BattlePath.Services
                 }
             }
             //place water randomly
-            while (Waters.Count < 7)
+            while (Waters.Count < 14)
             {
                 int wx = rng.Next(GridWidth);
                 int wy = rng.Next(GridHeight);
@@ -100,9 +103,9 @@ namespace BattlePath.Services
             foreach(Position e in Enemies)
             {
 
-                int space = (e.X - PlayerX)+(e.Y - PlayerY);
-                
-                if(space < 5)
+                int space = Math.Abs(e.X - PlayerX) + Math.Abs(e.Y - PlayerY);
+
+                if (space < 5)
                 {
                     if (e.Y < PlayerY)
                     {
