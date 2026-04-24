@@ -1,0 +1,62 @@
+﻿@page "/combat"
+<style>
+    body {
+        background-color: lightgreen !important;
+    }
+</style>
+@using BattlePath.Services
+@rendermode InteractiveServer
+@inject GameStateService GameState
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+
+<h3>Combat</h3>
+<h1>Combat loaded</h1>
+<canvas id="combatCanvas" width="400" height="300" style="border:1px solid black;"></canvas>
+<script src="js/combat.js"></script>
+<p>Player HP: @GameState.PlayerHealth</p>
+<p>Enemy HP: @GameState.EnemyHealth</p>
+
+<button @onclick="Attack">Attack</button>
+<button @onclick="Run">Run</button>
+
+@code {
+    private bool _initialized = false;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!_initialized)
+        {
+            _initialized = true;
+
+            // tiny delay to ensure DOM is ready
+            await Task.Delay(50);
+
+            await JS.InvokeVoidAsync("combatCanvas.drawScene");
+
+        }
+    }
+
+    private async Task Attack()
+    {
+        GameState.EnemyHealth -= GameState.PlayerAttack;
+
+        await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
+        
+
+        if (GameState.EnemyHealth <= 0)
+        {
+            GameState.EndCombat();
+            Nav.NavigateTo("/explore");
+        }
+    }
+
+    private void Run()
+    {
+        GameState.EndCombat();
+        Nav.NavigateTo("/explore");
+    }
+
+
+}

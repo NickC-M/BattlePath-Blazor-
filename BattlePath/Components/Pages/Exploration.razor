@@ -1,0 +1,130 @@
+﻿@page "/explore"
+@using BattlePath.Services
+@rendermode InteractiveServer
+@inject GameStateService GameState
+@inject IJSRuntime JS
+@inject NavigationManager Nav
+<h3>Exploration</h3>
+
+
+
+
+
+
+@if (!GameState.InCombat)
+{
+    //exploration canvas
+    <canvas id="exploreCanvas" width="400" height="400" style="border:2px solid black;"></canvas>
+
+    <p>Use buttons or WASD keys to move the player:</p>
+    <div>
+        <button @onclick="() => Move(0, -1)">Up (W)</button>
+        <button @onclick="() => Move(-1, 0)">Left (A)</button>
+        <button @onclick="() => Move(1, 0)">Right (D)</button>
+        <button @onclick="() => Move(0, 1)">Down (S)</button>
+    </div>
+}
+else
+{
+    //combat GUI
+    <div>
+        <h4>Combat!</h4>
+        <canvas id="combatCanvas" width="400" height="300" style="border:1px solid black;"></canvas>
+        <p>Player HP: @GameState.PlayerHealth</p>
+        <p>Enemy HP: @GameState.EnemyHealth</p>
+        <button @onclick="Attack">Attack</button>
+        <button @onclick="Run">Run</button>
+    </div>
+}
+
+@code {
+    private DotNetObjectReference<Exploration>? objRef;
+    private Random rng = new Random();
+    protected override void OnInitialized()
+    {
+        GameState.GenerateRoom();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            objRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("exploreCanvas.init");
+            await JS.InvokeVoidAsync("exploreControls.init", objRef);
+            await JS.InvokeVoidAsync("combatCanvas.init");
+            await DrawScene();
+
+        }
+    }
+
+    [JSInvokable]
+    public async Task Move(int dx, int dy)
+    {
+        if (!GameState.MovePlayer(dx, dy)) return;
+
+        if (GameState.IsEnemyHere())
+        {
+            GameState.StartCombat();
+            await InvokeAsync(StateHasChanged);
+            await JS.InvokeVoidAsync("combatCanvas.drawCombat");
+
+        }
+        else if (GameState.IsExitHere())
+        {
+            GameState.GenerateRoom();
+        }
+
+        await DrawScene();
+
+    }
+
+    private async Task DrawScene()
+    {
+        if (!GameState.InCombat)
+        {
+            await JS.InvokeVoidAsync(
+            "exploreCanvas.drawScene",
+            GameState.PlayerX,
+            GameState.PlayerY,
+            GameState.Enemies,
+            GameState.Exit,
+            GameState.GridWidth,
+            GameState.GridHeight
+            );
+            StateHasChanged();
+        }
+        else if(GameState.InCombat)
+        {
+            await JS.InvokeVoidAsync("combatCanvas.drawCombat");
+            StateHasChanged();
+        }
+
+    }
+
+    private async Task Attack()
+    {
+        GameState.EnemyHealth -= GameState.PlayerAttack;
+
+        //animation placeholder
+        await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
+
+
+        if (GameState.EnemyHealth <= 0)
+        {
+            GameState.EndCombat();
+            GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
+            await DrawScene();
+        }
+
+        await DrawScene();
+    }
+
+    private async Task Run()
+    {
+        GameState.EndCombat();
+        await Move(0, -1);
+
+        await DrawScene();
+    }
+}
