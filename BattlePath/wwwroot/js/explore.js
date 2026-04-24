@@ -2,7 +2,10 @@
     tile: null,
     playerImg: null,
     enemyImg: null,
+    exitImg: null,
+    waterImg: null,
     ready: false,
+
 
     init: function () {
         if (this.ready) return;
@@ -19,14 +22,18 @@
         this.enemyImg = new Image();
         this.enemyImg.src = 'images/goblin.png';
 
-        //exit Cave sprite
+        //exit tile sprite
         this.exitImg = new Image();
         this.exitImg.src = 'images/caveTileExit.png';
+
+        //water tile img
+        this.waterImg = new Image();
+        this.waterImg.src = 'images/caveWaterTile.png'
 
         this.ready = true;
     },
 
-    drawScene: function (playerX, playerY, enemies, exit, width, height) {
+    drawScene: function (playerX, playerY, enemies, waters, exit, width, height) {
         const canvas = document.getElementById('exploreCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -39,8 +46,22 @@
             //draw cave tiles
             for (let x = 0; x < width; x++) {
                 for (let y = 0; y < height; y++) {
+
                     ctx.drawImage(this.tile, x * cellW, y * cellH, cellW, cellH);
                 }
+            }
+
+            //draw water tiles
+            if (waters && waters.length > 0) {
+                waters.forEach(w => {
+                    const wx = w.X ?? w.x;
+                    const wy = w.Y ?? w.y;
+                    if (this.waterImg.complete) {
+                        ctx.drawImage(this.waterImg, wx * cellW, wy * cellH, cellW, cellH);
+                    } else {
+                        this.waterImg.onload = () => ctx.drawImage(this.waterImg, wx * cellW, wy * cellH, cellW, cellH);
+                    }
+                });
             }
 
             //draw exit image

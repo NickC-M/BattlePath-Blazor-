@@ -29,7 +29,7 @@ else
     //combat GUI
     <div>
         <h4>Combat!</h4>
-        <canvas id="combatCanvas" width="400" height="300" style="border:1px solid black;"></canvas>
+        <canvas id="combatCanvas" width="720" height="360" style="border:1px solid black;"></canvas>
         <p>Player HP: @GameState.PlayerHealth</p>
         <p>Enemy HP: @GameState.EnemyHealth</p>
         <button @onclick="Attack">Attack</button>
@@ -61,18 +61,28 @@ else
     [JSInvokable]
     public async Task Move(int dx, int dy)
     {
+        int tx = GameState.PlayerX;
+        int ty = GameState.PlayerY;
+
+
         if (!GameState.MovePlayer(dx, dy)) return;
 
-        if (GameState.IsEnemyHere())
+        if (GameState.IsExitHere())
+        {
+            GameState.GenerateRoom();
+        }
+        else if (GameState.IsEnemyHere())
         {
             GameState.StartCombat();
             await InvokeAsync(StateHasChanged);
             await JS.InvokeVoidAsync("combatCanvas.drawCombat");
 
         }
-        else if (GameState.IsExitHere())
+
+        if (GameState.IsWaterHere())
         {
-            GameState.GenerateRoom();
+            GameState.PlayerHealth--;
+            if(!GameState.MovePlayer(tx, ty)) return;
         }
 
         await DrawScene();
@@ -88,6 +98,7 @@ else
             GameState.PlayerX,
             GameState.PlayerY,
             GameState.Enemies,
+            GameState.Waters,
             GameState.Exit,
             GameState.GridWidth,
             GameState.GridHeight

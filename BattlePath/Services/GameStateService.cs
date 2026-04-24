@@ -17,7 +17,7 @@ namespace BattlePath.Services
 
         public List<Position> Enemies { get; set; } = new();
 
-        public List<Position> Holes { get; set; } = new();
+        public List<Position> Waters { get; set; } = new();
         public Position Exit { get; set; }
 
         private Random rng = new Random();
@@ -33,6 +33,7 @@ namespace BattlePath.Services
             PlayerX = 0;
             PlayerY = 0;
             Enemies.Clear();
+            Waters.Clear();
 
             //place enemies randomly
             while (Enemies.Count < numEnemies)
@@ -44,6 +45,18 @@ namespace BattlePath.Services
                     !Enemies.Any(e => e.X == ex && e.Y == ey))
                 {
                     Enemies.Add(new Position { X = ex, Y = ey });
+                }
+            }
+            //place water randomly
+            while (Waters.Count < 7)
+            {
+                int wx = rng.Next(GridWidth);
+                int wy = rng.Next(GridHeight);
+
+                if ((wx != PlayerX || wy != PlayerY) &&
+                    !Waters.Any(w => w.X == wx && w.Y == wy) && !Enemies.Any(e => e.X == wx && e.Y == wy))
+                {
+                    Waters.Add(new Position { X = wx, Y = wy });
                 }
             }
 
@@ -63,7 +76,7 @@ namespace BattlePath.Services
         public bool MovePlayer(int dx, int dy)
         {
             MoveEnemies();
-
+ 
             int nx = PlayerX + dx;
             int ny = PlayerY + dy;
 
@@ -94,7 +107,7 @@ namespace BattlePath.Services
                     if (e.Y < PlayerY)
                     {
                         test.X = e.X; test.Y = e.Y+ 1;
-                        if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test)) return;
+                        if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
                         e.Y++;
                     }
                     else if (e.Y == PlayerY) 
@@ -102,19 +115,19 @@ namespace BattlePath.Services
                         if(e.X < PlayerX)
                         {
                             test.X = e.X + 1; test.Y = e.Y;
-                            if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test)) return;
+                            if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
                             e.X++;
                         }else
                         {
                             test.X = e.X - 1; test.Y = e.Y;
-                            if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test)) return;
+                            if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
                             e.X--;
                         }
                     }
                     else
                     {
                         test.X = e.X; test.Y = e.Y - 1;
-                        if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test)) return;
+                        if (IsEnemyHere(test) || IsExitHere(test) || IsPlayerHere(test) || IsWaterHere(test)) return;
                         e.Y--;
                     }
                 }
@@ -128,6 +141,8 @@ namespace BattlePath.Services
         public bool IsExitHere() => PlayerX == Exit.X && PlayerY == Exit.Y;
         public bool IsExitHere(Position e) => e.X == Exit.X && e.Y == Exit.Y;
         public bool IsPlayerHere(Position e) => e.X == PlayerX && e.Y == PlayerY;
+        public bool IsWaterHere() => Waters.Any(w => w.X == PlayerX && w.Y == PlayerY);
+        public bool IsWaterHere(Position wa) => Waters.Any(w => w.X == wa.X && w.Y == wa.Y);
         public void StartCombat()
         {
             EnemyHealth = 50;

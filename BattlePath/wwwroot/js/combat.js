@@ -1,6 +1,7 @@
 ﻿window.combatCanvas = {
     playerImg: null,
     enemyImg: null,
+    backImg: null,
     init: function () {
         if (!this.playerImg) {
             this.playerImg = new Image();
@@ -10,14 +11,20 @@
             this.enemyImg = new Image();
             this.enemyImg.src = 'images/goblin.png'; //enemy sprite
         }
+        if (!this.backImg) {
+            this.backImg = new Image();
+            this.backImg.src = 'images/caveback.jpg';//background img
+        }
     },
 
     drawCombat: function () {
         const canvas = document.getElementById('combatCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+        if (this.backImg.complete) {
+            ctx.drawImage(this.backImg, 0, 0, canvas.width, canvas.height);
+        }
         //draw player on left
         if (this.playerImg.complete)
             ctx.drawImage(this.playerImg, 50, 100, 80, 80);
