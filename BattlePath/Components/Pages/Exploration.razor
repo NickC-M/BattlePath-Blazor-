@@ -132,15 +132,18 @@ else
 
         //animation placeholder
         await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
-
+        await DrawScene();
 
         if (GameState.EnemyHealth <= 0)
         {
+            await Task.Delay(1100);
             GameState.EndCombat();
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
+            await InvokeAsync(StateHasChanged);
             await DrawScene();
+            return;
         }
-        
+
         await EnemyTurn();
 
         await DrawScene();
@@ -161,8 +164,11 @@ else
         await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
         if(GameState.PlayerHealth <= 0)
         {
+
             GameState.EndCombat();
-            
+            await InvokeAsync(StateHasChanged);
+            GameState.PlayerHealth = 100; //restores health after dying  temp
+
         }
     }
 }

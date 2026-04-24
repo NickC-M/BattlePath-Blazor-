@@ -16,7 +16,7 @@
 
         //player sprite
         this.playerImg = new Image();
-        this.playerImg.src = 'images/wizard.png';
+        this.playerImg.src = 'images/warrior.png';
 
         //enemy sprite
         this.enemyImg = new Image();
