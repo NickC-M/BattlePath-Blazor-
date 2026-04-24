@@ -89,7 +89,7 @@ namespace BattlePath.Services
 
             PlayerX = nx;
             PlayerY = ny;
-            MoveEnemies();
+            
             return true;
         }
 

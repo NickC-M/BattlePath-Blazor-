@@ -1,5 +1,6 @@
 ﻿@page "/explore"
 @using BattlePath.Services
+@using BattlePath.Models
 @rendermode InteractiveServer
 @inject GameStateService GameState
 @inject IJSRuntime JS
@@ -70,29 +71,32 @@ else
     [JSInvokable]
     public async Task Move(int dx, int dy)
     {
-        int tx = GameState.PlayerX;
-        int ty = GameState.PlayerY;
+        int nx = GameState.PlayerX + dx;
+        int ny = GameState.PlayerY + dy;
+        var nextP = new Position { X = nx, Y = ny };
 
+        //block out of bounds
+        if (nx < 0 || nx >= GameState.GridWidth || ny < 0 || ny >= GameState.GridHeight) return;
 
-        if (!GameState.MovePlayer(dx, dy)) return;
+        if (GameState.IsWaterHere(nextP))
+        {
+            GameState.PlayerHealth--;
+            return;
+        }
+
+        GameState.MovePlayer(dx, dy);
+        GameState.MoveEnemies();
 
         if (GameState.IsExitHere())
         {
             GameState.GenerateRoom();
-        }
-        else if (GameState.IsEnemyHere())
+        }else if (GameState.IsEnemyHere())
         {
             GameState.StartCombat();
             await InvokeAsync(StateHasChanged);
             await JS.InvokeVoidAsync("combatCanvas.drawCombat");
-
         }
 
-        if (GameState.IsWaterHere())
-        {
-            GameState.PlayerHealth--;
-            if(!GameState.MovePlayer(tx, ty)) return;
-        }
 
         await DrawScene();
 
