@@ -1,7 +1,108 @@
-﻿@page "/"
+﻿@inject NavigationManager nav
+@page "/"
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
-<a href="/explore">Go to Combat</a>
-Welcome to your new app.
+<PageTitle>Welcome</PageTitle>
+
+<style>
+    .hero {
+        background: linear-gradient(90deg,rgba(99, 12, 12, 1) 2%, rgba(94, 60, 60, 1) 45%, rgba(38, 16, 16, 1) 64%, rgba(61, 40, 38, 1) 77%, rgba(0, 0, 0, 1) 98%);
+        color: white;
+        padding-top: 50px;
+        padding-bottom: 50px;
+    }
+
+    .feature-icon {
+        font-size: 3rem;
+        margin-bottom: 1rem;
+        color: #6a11cb;
+    }
+
+    .cta {
+        background-color: #f8f9fa;
+    }
+
+    .app-screenshot {
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        border-radius: 20px;
+        width: 400px;
+        height: 400px;
+    }
+
+</style>
+<!-- Hero Section -->
+<header class="hero">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-4 fw-bold mb-3">Battlepath</h1>
+                <p class="lead mb-4">
+                    Fight your way down the dungeon for not really any reason
+                </p>
+
+                <NavLink class="nav-link" href="Account/Register">
+                    
+                    <p class="btn btn-outline-light btn-lg">Register</p>
+                </NavLink>
+                <NavLink class="nav-link" href="Account/Login">
+                    <p class="btn btn-outline-light btn-lg">Login</p>
+                </NavLink>
+            </div>
+            <div class="col-lg-6 py-4">
+                <img src="/images//gamepromo.png" alt="App Screenshot" class="img-fluid app-screenshot">
+            </div>
+        </div>
+    </div>
+</header>
+
+
+<!-- Features Section -->
+<section id="features" class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Key Features</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-bolt feature-icon"></i>
+                    <h3>Lightning Fast</h3>
+                    <p>Experience unparalleled speed and performance.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-lock feature-icon"></i>
+                    <h3>Secure</h3>
+                    <p>Your data is protected with state-of-the-art encryption.</p>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="text-center">
+                    <i class="fas fa-sync feature-icon"></i>
+                    <h3>Easy Sync</h3>
+                    <p>Seamlessly sync across all your devices.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="bg-light py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 order-lg-2">
+                <h2 class="mb-4">About Battlepath</h2>
+                <p>
+                    BattlePath is a rougelite game made by NickCM. BattlePath was originally a game made with winForms, that version of the game can be found
+                </p>  <NavLink target="_blank" class="nav-link" href="https://github.com/NickC-M/BattlePath">
+                <button>Here</button> </NavLink>
+            <p> All images featured in the website were made by NickCM or sourced from:  </p><NavLink target="_blank" class="nav-link" href="https://pixelfrog-assets.itch.io/tiny-swords"><button>Here</button> </NavLink>
+               
+                <p>Join the battle!  <NavLink class="nav-link" href="explore"><button>Adventure</button> </NavLink></p>
+            </div>
+            <div class="col-lg-6 order-lg-1">
+                <img src="/images/warrior.png">
+            </div>
+        </div>
+    </div>
+</section>

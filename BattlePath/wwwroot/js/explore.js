@@ -12,7 +12,7 @@
 
         //cave tile
         this.tile = new Image();
-        this.tile.src = 'images/caveTile.jpg';
+        this.tile.src = 'images/tile3.png';
 
         //player sprite
         this.playerImg = new Image();
@@ -24,11 +24,11 @@
 
         //exit tile sprite
         this.exitImg = new Image();
-        this.exitImg.src = 'images/caveTileExit.png';
+        this.exitImg.src = 'images/tower.png';
 
         //water tile img
         this.waterImg = new Image();
-        this.waterImg.src = 'images/caveWaterTile.png'
+        this.waterImg.src = 'images/bush.png'
 
         this.ready = true;
     },
@@ -37,6 +37,7 @@
         const canvas = document.getElementById('exploreCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
+        
         const cellW = canvas.width / width;
         const cellH = canvas.height / height;
 

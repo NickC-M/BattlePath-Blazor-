@@ -10,7 +10,7 @@ namespace BattlePath.Services
         public int PlayerAttack { get; set; } = 10;
         public int EnemyHealth { get; set; } = 50;
 
-        public int GridWidth { get; set; } = 14;
+        public int GridWidth { get; set; } = 12;
         public int GridHeight { get; set; } = 12;
 
         public int PlayerX { get; set; }

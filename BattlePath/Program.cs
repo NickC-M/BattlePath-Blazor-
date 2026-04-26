@@ -67,6 +67,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 app.UseAntiforgery();
+app.UseAuthorization();
 app.UseStaticFiles();
 app.MapRazorPages();
 app.MapStaticAssets();

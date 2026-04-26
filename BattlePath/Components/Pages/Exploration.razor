@@ -1,4 +1,6 @@
-﻿@page "/explore"
+﻿
+@page "/explore"
+
 @using BattlePath.Services
 @using BattlePath.Models
 @rendermode InteractiveServer
@@ -19,8 +21,9 @@
         <h2 style=" text-align: left">Exploration  </h2>
         <h2 style=" text-align: right">Floor: <span class="badge badge-warning">@GameState.depth</span></h2>
     </div>
+    //<canvas id="exploreBackCanvas" width="1200" height="1200" style="border:2px solid black;"></canvas>
     //exploration canvas
-    <canvas id="exploreCanvas" width="1200" height="800" style="border:2px solid black;"></canvas>
+    <canvas id="exploreCanvas" width="800" height="800" style="border:2px solid black;"></canvas>
 
     <p>Use buttons or WASD keys to move the player:</p>
     <div>
