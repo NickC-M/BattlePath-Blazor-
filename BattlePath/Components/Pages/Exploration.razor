@@ -1,6 +1,8 @@
 ﻿
 @page "/explore"
+@using Microsoft.AspNetCore.Authorization
 
+@attribute [Authorize]
 @using BattlePath.Services
 @using BattlePath.Models
 @rendermode InteractiveServer

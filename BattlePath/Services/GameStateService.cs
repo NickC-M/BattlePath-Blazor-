@@ -77,6 +77,11 @@ namespace BattlePath.Services
                 int wx = rng.Next(GridWidth);
                 int wy = rng.Next(GridHeight);
 
+                while(wx < 4 && wy < 4)
+                {
+                    wx = rng.Next(GridWidth);
+                    wy = rng.Next(GridHeight);
+                }
                 if ((wx != PlayerX || wy != PlayerY) &&
                     !Waters.Any(w => w.X == wx && w.Y == wy) && !Enemies.Any(e => e.X == wx && e.Y == wy))
                 {
@@ -88,11 +93,17 @@ namespace BattlePath.Services
 
             int exitX = rng.Next(GridWidth);
             int exitY = rng.Next(GridHeight);
-            while ((Enemies.Any(e => e.X == exitX && e.Y == exitY)) || (exitX == PlayerX && exitY == PlayerY))
+            while (exitX < 4 && exitY < 4)
             {
                 exitX = rng.Next(GridWidth);
                 exitY = rng.Next(GridHeight);
             }
+            while ((Enemies.Any(e => e.X == exitX && e.Y == exitY)) || (exitX == PlayerX && exitY == PlayerY) || Waters.Any(e => e.X == exitX && e.Y == exitY))
+            {
+                exitX = rng.Next(GridWidth);
+                exitY = rng.Next(GridHeight);
+            }
+
 
             Exit = new Position { X = exitX, Y = exitY };
         }
@@ -115,8 +126,7 @@ namespace BattlePath.Services
 
         public void MoveEnemies()
         {
-            //move enemies 1 square if within 4 spaces to player 
-            //place this function in moveplayer so that enemies move every time player moves
+            
 
 
             Position test = new Position();
@@ -126,7 +136,7 @@ namespace BattlePath.Services
 
                 int space = Math.Abs(e.X - PlayerX) + Math.Abs(e.Y - PlayerY);
 
-                if (space < 5)
+                if (space < 4)
                 {
                     int dx = PlayerX - e.X;
                     int dy = PlayerY - e.Y;
