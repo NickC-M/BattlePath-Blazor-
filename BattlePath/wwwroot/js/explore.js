@@ -1,7 +1,8 @@
-﻿window.exploreCanvas = {
+﻿
+window.exploreCanvas = {
     tile: null,
     playerImg: null,
-    enemyImg: null,
+    enemyImgs: {},
     exitImg: null,
     waterImg: null,
     ready: false,
@@ -19,8 +20,8 @@
         this.playerImg.src = 'images/warrior.png';
 
         //enemy sprite
-        this.enemyImg = new Image();
-        this.enemyImg.src = 'images/goblin.png';
+        //this.enemyImg = new Image();
+        //this.enemyImg.src = 'images/goblin.png';
 
         //exit tile sprite
         this.exitImg = new Image();
@@ -33,11 +34,22 @@
         this.ready = true;
     },
 
+    updateEnemyImage: function (enemyId, iconPath) {
+        if (!enemyId) return;
+
+        if (!this.enemyImgs[enemyId]) {
+            this.enemyImgs[enemyId] = new Image();
+        }
+
+        // force reload if same enemy changes image later
+        this.enemyImgs[enemyId].src = iconPath;
+    },
+
     drawScene: function (playerX, playerY, enemies, waters, exit, width, height) {
         const canvas = document.getElementById('exploreCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
-        
+
         const cellW = canvas.width / width;
         const cellH = canvas.height / height;
 
@@ -73,14 +85,21 @@
             }
 
             //draw enemies images
-            if (enemies && enemies.length > 0) {
+            if (enemies) {
                 enemies.forEach(e => {
-                    const ex = e.X ?? e.x;
-                    const ey = e.Y ?? e.y;
-                    if (this.enemyImg.complete) {
-                        ctx.drawImage(this.enemyImg, ex * cellW, ey * cellH, cellW, cellH);
-                    } else {
-                        this.enemyImg.onload = () => ctx.drawImage(this.enemyImg, ex * cellW, ey * cellH, cellW, cellH);
+                    const ex = e.x;
+                    const ey = e.y;
+
+                    let img = this.enemyImgs[e.id];
+
+                    if (!img) {
+                        img = new Image();
+                        img.src = e.icon;
+                        this.enemyImgs[e.id] = img;
+                    }
+
+                    if (img.complete && img.naturalWidth > 0) {
+                        ctx.drawImage(img, ex * cellW, ey * cellH, cellW, cellH);
                     }
                 });
             }
@@ -109,7 +128,7 @@ window.exploreControls = {
             if (window.inCombat) return;
 
             let dx = 0, dy = 0;
-            
+
             switch (e.key.toLowerCase()) {
                 case 'w':
                 case 'arrowup':

@@ -2,6 +2,20 @@
 <HeadContent>
     <script src="js/combat.js"></script>
     <script src="js/explore.js"></script>
+    <script>
+        function openFullscreen() {
+        var element = document.documentElement;  // This makes the whole page go fullscreen
+        if (element.requestFullscreen) {
+        element.requestFullscreen();
+        } else if (element.mozRequestFullScreen) {  // Firefox
+        element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) {  // Chrome, Safari, Opera
+        element.webkitRequestFullscreen();
+        } else if (element.msRequestFullscreen) {  // IE/Edge
+        element.msRequestFullscreen();
+        }
+        }
+    </script>
 </HeadContent>
 
 <div class="page">

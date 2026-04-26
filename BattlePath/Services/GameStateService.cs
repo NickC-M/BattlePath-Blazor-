@@ -6,9 +6,9 @@ namespace BattlePath.Services
 {
     public class GameStateService
     {
-        public int PlayerHealth { get; set; } = 100;
+        public int PlayerHealth { get; set; } = 50;
+        public int PlayerMaxHealth { get; set; } = 50;
         public int PlayerAttack { get; set; } = 10;
-        public int EnemyHealth { get; set; } = 50;
 
         public int GridWidth { get; set; } = 12;
         public int GridHeight { get; set; } = 12;
@@ -16,7 +16,10 @@ namespace BattlePath.Services
         public int PlayerX { get; set; }
         public int PlayerY { get; set; }
 
-        public List<Position> Enemies { get; set; } = new();
+        public Enemy? CurrentEnemy { get; set; }
+        public int CurrentEnemyMaxHp { get; set; }
+
+        public List<Enemy> Enemies { get; set; } = new();
 
         public List<Position> Waters { get; set; } = new();
         public Position Exit { get; set; }
@@ -38,18 +41,35 @@ namespace BattlePath.Services
             PlayerY = 0;
             Enemies.Clear();
             Waters.Clear();
+            int i = 0;
            // numEnemies += Math.Min((depth), 15);
             //place enemies randomly
             while (Enemies.Count < numEnemies)
             {
+                
                 int ex = rng.Next(GridWidth);
                 int ey = rng.Next(GridHeight);
 
                 if ((ex != PlayerX || ey != PlayerY) &&
                     !Enemies.Any(e => e.X == ex && e.Y == ey))
                 {
-                    Enemies.Add(new Position { X = ex, Y = ey });
+                    int n = rng.Next(3);
+                    if(depth < 3) Enemies.Add(new Enemy(i,ex, ey, "Goblin", 30, 5, "images/goblin.png"));
+
+                    else if (n == 0)
+                    {
+                        Enemies.Add(new Enemy(i,ex, ey, "Goblin", 30, 5, "images/goblin.png" ));
+                    }
+                    else if (n == 1)
+                    {
+                        Enemies.Add(new Enemy(i,ex, ey, "Skeleton", 25, 8, "images/skeloton.png"));
+                    }
+                    else if (n == 2)
+                    {
+                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 12, 15, "images/rat.png"));
+                    }
                 }
+                i++;
             }
             //place water randomly
             while (Waters.Count < 20)
@@ -146,7 +166,8 @@ namespace BattlePath.Services
         }
         public void StartCombat()
         {
-            EnemyHealth = 50;
+            CurrentEnemy = Enemies.FirstOrDefault(e => e.X == PlayerX && e.Y == PlayerY);
+            CurrentEnemyMaxHp = CurrentEnemy.Hp;
             InCombat = true;
         }
 

@@ -54,12 +54,17 @@ else
 
                 <div class="progress" style="height: 20px;">
                     <div class="progress-bar bg-success"
-                         style="width:@GameState.PlayerHealth%">
-                        @GameState.PlayerHealth
+                         role="progressbar"
+                         style="width:@(GameState.PlayerHealth * 100 / GameState.PlayerMaxHealth)%"
+                         aria-valuenow="@GameState.PlayerHealth"
+                         aria-valuemin="0"
+                         aria-valuemax="@GameState.PlayerMaxHealth">
+                        @GameState.PlayerHealth / @GameState.PlayerMaxHealth
                     </div>
                 </div>
 
                 <div style="margin-top: 10px;">
+                    <div>Max Hp: @GameState.PlayerMaxHealth</div>
                     <div>Attack: @GameState.PlayerAttack</div>
                     <div>Floor: @GameState.depth</div>
                 </div>
@@ -67,18 +72,20 @@ else
 
             <!-- ENEMY PANEL -->
             <div class="card p-2">
-                <h5>Enemy</h5>
-
+                <h5>@GameState.CurrentEnemy.Name</h5>
                 <div class="progress" style="height: 20px;">
-                    <div class="progress-bar bg-danger"
-                         style="width:@GameState.EnemyHealth%">
-                        @GameState.EnemyHealth
-                    </div>
+                <div class="progress-bar bg-danger"
+                     role="progressbar"
+                     style="width:@(GameState.CurrentEnemy.Hp * 100 / GameState.CurrentEnemyMaxHp)%"
+                      aria-valuenow="@GameState.CurrentEnemy.Hp"
+                      aria-valuemin="0"
+                      aria-valuemax="@GameState.CurrentEnemyMaxHp">
+                    @GameState.CurrentEnemy.Hp / @GameState.CurrentEnemyMaxHp
                 </div>
-
+                </div>
                 <div style="margin-top: 10px;">
-                    <div>Attack: 5</div> <!--placeholders-->
-                    <div>Status: Aggressive</div> <!--placeholders-->
+                    <div>Attack: @GameState.CurrentEnemy.Atk</div> <!--placeholders-->
+                    <div>Max Hp: @GameState.CurrentEnemyMaxHp</div>
                 </div>
             </div>
 
@@ -95,15 +102,18 @@ else
 @code {
     private DotNetObjectReference<Exploration>? objRef;
     private Random rng = new Random();
+    private int cEMaxHp = 0;
     protected override void OnInitialized()
     {
         GameState.GenerateRoom();
     }
 
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
+            await JS.InvokeVoidAsync("openFullscreen");
             objRef = DotNetObjectReference.Create(this);
             await JS.InvokeVoidAsync("exploreCanvas.init");
             await JS.InvokeVoidAsync("exploreControls.init", objRef);
@@ -137,9 +147,12 @@ else
             GameState.GenerateRoom();
         }else if (GameState.IsEnemyHere())
         {
+
+
             GameState.StartCombat();
             await InvokeAsync(StateHasChanged);
-            await JS.InvokeVoidAsync("combatCanvas.drawCombat");
+            await JS.InvokeVoidAsync("combatCanvas.drawCombat",
+    GameState.CurrentEnemy?.IconPath);
         }
 
 
@@ -151,11 +164,23 @@ else
     {
         if (!GameState.InCombat)
         {
+            foreach (var enemy in GameState.Enemies)
+            {
+                await JS.InvokeVoidAsync("exploreCanvas.updateEnemyImage", enemy.Id, enemy.IconPath);
+            }
+
+            var enemies = GameState.Enemies.Select(e => new
+            {
+                id = e.Id,
+                x = e.X,
+                y = e.Y,
+                icon = e.IconPath
+            });
             await JS.InvokeVoidAsync(
             "exploreCanvas.drawScene",
             GameState.PlayerX,
             GameState.PlayerY,
-            GameState.Enemies,
+            enemies,
             GameState.Waters,
             GameState.Exit,
             GameState.GridWidth,
@@ -165,7 +190,12 @@ else
         }
         else if(GameState.InCombat)
         {
-            await JS.InvokeVoidAsync("combatCanvas.drawCombat");
+
+            int cEMaxHp = GameState.CurrentEnemy.Hp;
+
+            
+            await JS.InvokeVoidAsync("combatCanvas.drawCombat",
+    GameState.CurrentEnemy?.IconPath);
             StateHasChanged();
         }
 
@@ -173,13 +203,13 @@ else
 
     private async Task Attack()
     {
-        GameState.EnemyHealth -= GameState.PlayerAttack;
+        GameState.CurrentEnemy.Hp -= GameState.PlayerAttack;
 
         //animation placeholder
         await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
         await DrawScene();
 
-        if (GameState.EnemyHealth <= 0)
+        if (GameState.CurrentEnemy.Hp <= 0)
         {
             await Task.Delay(1100);
             GameState.EndCombat();
@@ -207,7 +237,7 @@ else
         
         //animation placeholder
         await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
-        GameState.PlayerHealth -= 5;
+        GameState.PlayerHealth -= GameState.CurrentEnemy.Atk;
         if(GameState.PlayerHealth <= 0)
         {
 

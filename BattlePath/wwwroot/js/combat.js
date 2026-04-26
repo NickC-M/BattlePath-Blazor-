@@ -45,6 +45,11 @@
         }
     },
 
+    updateEnemyImage: function (iconPath) {
+        this.enemyImg = new Image();
+        this.enemyImg.src = iconPath;  //update enemy img
+    },
+
     loop: function (time) {
         const dt = (time - this.lastTime) / 1000;
         this.lastTime = time;
@@ -107,7 +112,7 @@
     },
 
 
-    drawCombat: function () {
+    drawCombat: function (enemyIcon) {
         const canvas = document.getElementById('combatCanvas');
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -119,6 +124,14 @@
 
         ctx.save();
         ctx.translate(shakeX, shakeY);
+
+
+        if (enemyIcon) {
+            if (!this.enemyImg || this.enemyImg.src !== enemyIcon) {
+                this.enemyImg = new Image();
+                this.enemyImg.src = enemyIcon;
+            }
+        }
 
         //draw background
         if (this.backImg.complete) {
