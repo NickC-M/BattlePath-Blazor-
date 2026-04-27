@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 builder.Services.AddScoped<GameStateService>(); //GAME STATE SERVICE ADDED
+builder.Services.AddScoped<SaveService>(); //SAVE SERVICE ADDED
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<GameStateService>();
