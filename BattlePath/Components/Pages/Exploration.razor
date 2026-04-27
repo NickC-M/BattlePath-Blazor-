@@ -258,8 +258,9 @@ else
         {
             await Task.Delay(1100);
             GameState.PlayerExp += GameState.CurrentEnemy.Xp;
-            await EndCombatAndSave();
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
+            await EndCombatAndSave();
+            
             await InvokeAsync(StateHasChanged);
             await DrawScene();
             return;
