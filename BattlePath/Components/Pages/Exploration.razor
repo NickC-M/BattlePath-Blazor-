@@ -1,14 +1,20 @@
 ﻿
 @page "/explore"
 @using Microsoft.AspNetCore.Authorization
-
+@using Microsoft.AspNetCore.Identity;
 @attribute [Authorize]
 @using BattlePath.Services
 @using BattlePath.Models
+@using BattlePath.Data
+@using System.Text.Json;
 @rendermode InteractiveServer
 @inject GameStateService GameState
+@inject SaveService SaveService
+@inject UserManager<ApplicationUser> UserManager
+@inject AuthenticationStateProvider AuthStateProvider
 @inject IJSRuntime JS
 @inject NavigationManager Nav
+
 
 
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
@@ -138,9 +144,13 @@ else
     private DotNetObjectReference<Exploration>? objRef;
     private Random rng = new Random();
     private int cEMaxHp = 0;
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
-        GameState.GenerateRoom();
+        await LoadGame();
+        if (GameState.depth == 0)
+        {
+            GameState.GenerateRoom();
+        }
     }
 
 
@@ -248,7 +258,7 @@ else
         {
             await Task.Delay(1100);
             GameState.PlayerExp += GameState.CurrentEnemy.Xp;
-            GameState.EndCombat();
+            await EndCombatAndSave();
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
             await InvokeAsync(StateHasChanged);
             await DrawScene();
@@ -262,7 +272,7 @@ else
 
     private async Task Run()
     {
-        GameState.EndCombat();
+        await EndCombatAndSave();
         await Move(0, -1);
 
         await DrawScene();
@@ -270,17 +280,55 @@ else
 
     private async Task EnemyTurn()
     {
-        
+
         //animation placeholder
         await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
         GameState.PlayerHealth -= GameState.CurrentEnemy.Atk;
         if(GameState.PlayerHealth <= 0)
         {
 
-            GameState.EndCombat();
+            await EndCombatAndSave();
             await InvokeAsync(StateHasChanged);
             GameState.PlayerHealth = 100; //restores health after dying  temp
 
+        }
+    }
+
+    private async Task SaveGame()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = await UserManager.GetUserAsync(authState.User);
+
+        if (user == null) return;
+
+        var save = SaveService.CreateSave(GameState);
+
+        user.SaveDataJson = JsonSerializer.Serialize(save);
+
+        await UserManager.UpdateAsync(user);
+    }
+
+    private async Task EndCombatAndSave()
+    {
+        GameState.EndCombat();
+        await SaveGame();
+    }
+
+    private async Task LoadGame()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = await UserManager.GetUserAsync(authState.User);
+
+        if (user == null) return;
+
+        if (string.IsNullOrEmpty(user.SaveDataJson))
+            return; //no save yet
+
+        var save = JsonSerializer.Deserialize<Save>(user.SaveDataJson);
+
+        if (save != null)
+        {
+            SaveService.LoadSave(save, GameState);
         }
     }
 }
