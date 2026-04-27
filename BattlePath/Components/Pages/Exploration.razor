@@ -25,14 +25,45 @@
     </div>
     //<canvas id="exploreBackCanvas" width="1200" height="1200" style="border:2px solid black;"></canvas>
     //exploration canvas
-    <canvas id="exploreCanvas" width="800" height="800" style="border:2px solid black;"></canvas>
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
 
+        <div>
+    <canvas id="exploreCanvas" width="800" height="800" style="border:2px solid black;"></canvas>
+        </div>
+     <!-- RIGHT: HUD PANEL -->
+        <div style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
+
+            <!-- PLAYER PANEL -->
+            <div class="card p-2">
+                <h5>Player</h5>
+
+                <div class="progress" style="height: 20px;">
+                    <div class="progress-bar bg-success"
+                         role="progressbar"
+                         style="width:@(GameState.PlayerHealth * 100 / GameState.PlayerMaxHealth)%"
+                         aria-valuenow="@GameState.PlayerHealth"
+                         aria-valuemin="0"
+                         aria-valuemax="@GameState.PlayerMaxHealth">
+                        @GameState.PlayerHealth / @GameState.PlayerMaxHealth
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px;">
+                    <div>Max Hp: @GameState.PlayerMaxHealth</div>
+                    <div>Attack: @GameState.PlayerAttack</div>
+                    <div>Exp: @GameState.PlayerExp</div>
+                    <div>Level: @GameState.PlayerLvl</div>
+                    <div>Floor: @GameState.depth</div>
+                </div>
+            </div>
+    </div>
     <p>Use buttons or WASD keys to move the player:</p>
     <div>
         <button @onclick="() => Move(0, -1)">Up (W)</button>
         <button @onclick="() => Move(-1, 0)">Left (A)</button>
         <button @onclick="() => Move(1, 0)">Right (D)</button>
         <button @onclick="() => Move(0, 1)">Down (S)</button>
+    </div>
     </div>
 }
 else
@@ -68,6 +99,7 @@ else
                 <div style="margin-top: 10px;">
                     <div>Max Hp: @GameState.PlayerMaxHealth</div>
                     <div>Attack: @GameState.PlayerAttack</div>
+                    <div>Exp: @GameState.PlayerExp</div>
                     <div>Floor: @GameState.depth</div>
                 </div>
             </div>
@@ -86,8 +118,9 @@ else
                 </div>
                 </div>
                 <div style="margin-top: 10px;">
-                    <div>Attack: @GameState.CurrentEnemy.Atk</div> <!--placeholders-->
+                    <div>Attack: @GameState.CurrentEnemy.Atk</div> 
                     <div>Max Hp: @GameState.CurrentEnemyMaxHp</div>
+                    <div>Exp: @GameState.CurrentEnemy.Xp</div>
                 </div>
             </div>
 
@@ -195,7 +228,7 @@ else
 
             int cEMaxHp = GameState.CurrentEnemy.Hp;
 
-            
+
             await JS.InvokeVoidAsync("combatCanvas.drawCombat",
     GameState.CurrentEnemy?.IconPath);
             StateHasChanged();
@@ -214,6 +247,7 @@ else
         if (GameState.CurrentEnemy.Hp <= 0)
         {
             await Task.Delay(1100);
+            GameState.PlayerExp += GameState.CurrentEnemy.Xp;
             GameState.EndCombat();
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
             await InvokeAsync(StateHasChanged);

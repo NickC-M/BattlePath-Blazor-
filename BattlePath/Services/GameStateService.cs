@@ -9,6 +9,8 @@ namespace BattlePath.Services
         public int PlayerHealth { get; set; } = 50;
         public int PlayerMaxHealth { get; set; } = 50;
         public int PlayerAttack { get; set; } = 10;
+        public int PlayerExp { get; set; } = 0;
+        public int PlayerLvl { get; set; }
 
         public int GridWidth { get; set; } = 12;
         public int GridHeight { get; set; } = 12;
@@ -54,19 +56,19 @@ namespace BattlePath.Services
                     !Enemies.Any(e => e.X == ex && e.Y == ey))
                 {
                     int n = rng.Next(3);
-                    if(depth < 3) Enemies.Add(new Enemy(i,ex, ey, "Goblin", 30, 5, "images/goblin.png"));
+                    if(depth < 3) Enemies.Add(new Enemy(i,ex, ey, "Goblin", 30, 5, "images/goblin.png",4));
 
                     else if (n == 0)
                     {
-                        Enemies.Add(new Enemy(i,ex, ey, "Goblin", 30, 5, "images/goblin.png" ));
+                        Enemies.Add(new Enemy(i, ex, ey, "Goblin", 30+(depth/3), 5, "images/goblin.png", (4 + (depth / 4))));
                     }
                     else if (n == 1)
                     {
-                        Enemies.Add(new Enemy(i,ex, ey, "Skeleton", 25, 8, "images/skeloton.png"));
+                        Enemies.Add(new Enemy(i,ex, ey, "Skeleton", 25 + (depth / 2), 8, "images/skeloton.png", (7 + (depth / 3))));
                     }
                     else if (n == 2)
                     {
-                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 12, 15, "images/rat.png"));
+                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 15 + (depth / 2), 16 + (depth / 3), "images/rat.png", (15 + (depth / 2))));
                     }
                 }
                 i++;
@@ -184,6 +186,8 @@ namespace BattlePath.Services
 
         public void EndCombat()
         {
+            
+            
             InCombat = false;
         }
 

@@ -6,10 +6,10 @@
         public string Name { get; set; } = string.Empty;
         public int Hp { get; set; }
         public int Atk { get; set; }
-
+        public int Xp { get; set; }
         public string IconPath { get; set; } = string.Empty;
 
-        public Enemy(int id, int x, int y,string name, int hp, int atk, string iconPath)
+        public Enemy(int id, int x, int y,string name, int hp, int atk, string iconPath, int xp)
         {
             Id = id;
             X = x; 
@@ -18,6 +18,7 @@
             Hp = hp;
             Atk = atk;
             IconPath = iconPath;
+            Xp = xp;
         }
     }
 }
