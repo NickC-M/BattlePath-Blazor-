@@ -4,9 +4,11 @@
     {
 
         public int PlayerHealth { get; set; }
-        public int PlayerMaxHealth { get; set; }
+        public int PlayerMaxHealth { get; set; } = 0;
         public int PlayerExp { get; set; }
         public int PlayerLvl { get; set; }
+        public int PlayerX { get; set; }
+        public int PlayerY { get; set; }
 
         public int PlayerAttack { get; set; }
 
