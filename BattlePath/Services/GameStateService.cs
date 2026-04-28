@@ -74,7 +74,7 @@ namespace BattlePath.Services
                     }
                     else if (n == 2)
                     {
-                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 15 + (depth / 2), 16 + (depth / 3), "images/rat2.png", (15 + (depth / 2))));
+                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 15 + (depth / 2), 16 + (depth / 3), "images/rat.png", (15 + (depth / 2))));
                     }
                 }
                 i++;
