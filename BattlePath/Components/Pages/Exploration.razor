@@ -281,8 +281,7 @@ else
 
     private async Task EnemyTurn()
     {
-
-        //animation placeholder
+        //enemy animation
         await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
         GameState.PlayerHealth -= GameState.CurrentEnemy.Atk;
         if(GameState.PlayerHealth <= 0)

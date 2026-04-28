@@ -60,7 +60,7 @@ namespace BattlePath.Services
 
                     else if (n == 0)
                     {
-                        Enemies.Add(new Enemy(i, ex, ey, "Goblin", 30+(depth/3), 5, "images/goblin.png", (4 + (depth / 4))));
+                        Enemies.Add(new Enemy(i, ex, ey, "Goblin", 30+(depth/3), 5, "images/goblin.png", (4 + (depth / 4))));                         //scaling tied to depth
                     }
                     else if (n == 1)
                     {
