@@ -6,6 +6,8 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using BattlePath.Data
+@using BattlePath.Models
+@using System.Text.Json
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -73,6 +75,44 @@
     public async Task RegisterUser(EditContext editContext)
     {
         var user = CreateUser();
+
+        var game = new GameStateService(); //create game service and save for new user
+        game.GenerateRoom();
+
+        var save = new Save //save for new user
+        {
+            PlayerHealth = game.PlayerHealth,
+            PlayerMaxHealth = game.PlayerMaxHealth,
+            PlayerExp = game.PlayerExp,
+            PlayerLvl = game.PlayerLvl,
+            PlayerAttack = game.PlayerAttack,
+
+            PlayerX = game.PlayerX,
+            PlayerY = game.PlayerY,
+
+            depth = game.depth,
+            InCombat = game.InCombat,
+
+            Exit = game.Exit,
+            Waters = game.Waters.ToList(),
+
+            Enemies = game.Enemies.Select(e => new Enemy(
+                e.Id, e.X, e.Y, e.Name, e.Hp, e.Atk, e.IconPath, e.Xp
+            )).ToList(),
+
+            CurrentEnemy = game.CurrentEnemy == null ? null : new Enemy(
+                game.CurrentEnemy.Id,
+                game.CurrentEnemy.X,
+                game.CurrentEnemy.Y,
+                game.CurrentEnemy.Name,
+                game.CurrentEnemy.Hp,
+                game.CurrentEnemy.Atk,
+                game.CurrentEnemy.IconPath,
+                game.CurrentEnemy.Xp
+            )
+        };
+
+        user.SaveDataJson = JsonSerializer.Serialize(save); //attach newly generated save to database field
 
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
