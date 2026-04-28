@@ -30,7 +30,7 @@
         }
         if (!this.backImg) {
             this.backImg = new Image();
-            this.backImg.src = 'images/caveback.jpg';//background img
+            this.backImg.src = 'images/grassfield2.jpg';//background img
         }
 
         if (!this.attackImg) {
