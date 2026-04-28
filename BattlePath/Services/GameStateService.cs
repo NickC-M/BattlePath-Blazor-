@@ -10,7 +10,9 @@ namespace BattlePath.Services
         public int PlayerMaxHealth { get; set; } = 50;
         public int PlayerAttack { get; set; } = 10;
         public int PlayerExp { get; set; } = 0;
-        public int PlayerLvl { get; set; }
+        public int PlayerLvl { get; set; } = 1;
+
+        public int PlayerPerma { get; set; } = 0;
 
         public int GridWidth { get; set; } = 12;
         public int GridHeight { get; set; } = 12;
@@ -38,6 +40,10 @@ namespace BattlePath.Services
         //create a new room
         public void GenerateRoom()
         {
+            if(PlayerHealth != PlayerMaxHealth)
+            {
+                PlayerHealth = Math.Min((PlayerHealth + PlayerMaxHealth / 5), PlayerMaxHealth);
+            }
             depth++;
             PlayerX = 0;
             PlayerY = 0;
@@ -68,7 +74,7 @@ namespace BattlePath.Services
                     }
                     else if (n == 2)
                     {
-                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 15 + (depth / 2), 16 + (depth / 3), "images/rat.png", (15 + (depth / 2))));
+                        Enemies.Add(new Enemy(i,ex, ey, "Rat", 15 + (depth / 2), 16 + (depth / 3), "images/rat2.png", (15 + (depth / 2))));
                     }
                 }
                 i++;
@@ -189,6 +195,23 @@ namespace BattlePath.Services
             
             
             InCombat = false;
+        }
+
+        public void PlayerDeath()
+        {
+            for(int i = 0; i < PlayerLvl / 10; i++)
+            {
+                PlayerLvl -= 10;
+                PlayerPerma++;
+            }
+           
+            depth = 0;
+            PlayerExp = 0;
+            PlayerLvl = 0;
+            PlayerMaxHealth = 50 + (4 * PlayerPerma);
+            PlayerHealth = PlayerMaxHealth;
+            PlayerAttack = 10 + PlayerPerma;
+            GenerateRoom();
         }
 
     }

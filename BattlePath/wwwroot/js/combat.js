@@ -181,7 +181,7 @@
     eAttackAnimation: function () {
         const s = this.state;
         let t = 0;
-        setTimeout(() => {
+        
             const anim = setInterval(() => {
 
                 t += 0.05;
@@ -197,7 +197,7 @@
                 s.flash = 0.6;
                 s.shake = 10;
             }, 120);
-        }, 1200);
+        
         
         
     }

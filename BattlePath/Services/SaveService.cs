@@ -12,6 +12,7 @@ namespace BattlePath.Services
                 PlayerMaxHealth = game.PlayerMaxHealth,
                 PlayerExp = game.PlayerExp,
                 PlayerLvl = game.PlayerLvl,
+                PlayerPerma = game.PlayerPerma,
                 PlayerAttack = game.PlayerAttack,
 
                 PlayerX = game.PlayerX,
@@ -46,6 +47,7 @@ namespace BattlePath.Services
             game.PlayerMaxHealth = save.PlayerMaxHealth;
             game.PlayerExp = save.PlayerExp;
             game.PlayerLvl = save.PlayerLvl;
+            game.PlayerPerma = save.PlayerPerma;
             game.PlayerAttack = save.PlayerAttack;
             game.PlayerX = save.PlayerX;
             game.PlayerY = save.PlayerY;

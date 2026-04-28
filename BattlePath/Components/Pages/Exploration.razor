@@ -20,7 +20,56 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
 
+<style>
 
+    .levelup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .levelup-box {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        text-align: center;
+    }
+
+    .choices {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .choice {
+        cursor: pointer;
+        border: 2px solid black;
+        padding: 10px;
+        transition: 0.2s;
+    }
+
+    .choice:hover {
+        background: lightgray;
+    }
+
+    .levelup-box {
+        background: url('/images/table.png') no-repeat center center;
+        background-size: contain; /* scale image to cover the box */
+        padding: 50px;
+        border-radius: 0px;
+        text-align: center;
+        color: white; /* optional, ensures text is readable */
+        box-shadow: 0 0 15px rgba(0,0,0,0.5); /* optional shadow for depth */
+    }
+
+</style>
 
 @if (!GameState.InCombat)
 {
@@ -57,8 +106,10 @@
                 <div style="margin-top: 10px;">
                     <div>Max Hp: @GameState.PlayerMaxHealth</div>
                     <div>Attack: @GameState.PlayerAttack</div>
-                    <div>Exp: @GameState.PlayerExp</div>
+                    <div>Perma Stats: @GameState.PlayerPerma</div>
                     <div>Level: @GameState.PlayerLvl</div>
+                    <div>Exp: @GameState.PlayerExp</div>
+                    
                     <div>Floor: @GameState.depth</div>
                 </div>
             </div>
@@ -70,7 +121,13 @@
         <button @onclick="() => Move(1, 0)">Right (D)</button>
         <button @onclick="() => Move(0, 1)">Down (S)</button>
     </div>
+
+
+
+
     </div>
+
+   
 }
 else
 {
@@ -105,6 +162,8 @@ else
                 <div style="margin-top: 10px;">
                     <div>Max Hp: @GameState.PlayerMaxHealth</div>
                     <div>Attack: @GameState.PlayerAttack</div>
+                    <div>Perma Stats: @GameState.PlayerPerma</div>
+                    <div>Level: @GameState.PlayerLvl</div>
                     <div>Exp: @GameState.PlayerExp</div>
                     <div>Floor: @GameState.depth</div>
                 </div>
@@ -136,11 +195,41 @@ else
                 <button @onclick="Run">Run</button>
             </div>
 
+
+            
+
         </div>
     </div>
 }
 
+@if (showLevelUp)
+{
+    <div class="card p-2">
+        <div class="levelup-overlay">
+            <div class="levelup-box">
+                <h3>Level Up!</h3>
+                <p>Choose an upgrade:</p>
+
+                <div class="choices">
+                    <div class="choice" @onclick="ChooseAttack">
+                        <img src="images/sword.png" width="100" />
+                        <p>+1 Attack</p>
+                    </div>
+
+                    <div class="choice" @onclick="ChooseHealth">
+                        <img src="images/meat.png" width="100" />
+                        <p>+5 Max HP</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+
 @code {
+    private bool showLevelUp = false;
     private DotNetObjectReference<Exploration>? objRef;
     private Random rng = new Random();
     private int cEMaxHp = 0;
@@ -171,6 +260,14 @@ else
     [JSInvokable]
     public async Task Move(int dx, int dy)
     {
+        if (showLevelUp) return;
+        if (GameState.PlayerExp >= 10)
+        {
+            GameState.PlayerLvl++;
+            GameState.PlayerExp -= 10;
+            await JS.InvokeVoidAsync("playSound", "sounds/levelup.mp3");
+            showLevelUp = true;
+        }
         int nx = GameState.PlayerX + dx;
         int ny = GameState.PlayerY + dy;
         var nextP = new Position { X = nx, Y = ny };
@@ -189,6 +286,7 @@ else
 
         if (GameState.IsExitHere())
         {
+            await JS.InvokeVoidAsync("playSound", "sounds/good.wav");
             GameState.GenerateRoom();
         }else if (GameState.IsEnemyHere())
         {
@@ -248,19 +346,29 @@ else
 
     private async Task Attack()
     {
+        if (showLevelUp) return;
         GameState.CurrentEnemy.Hp -= GameState.PlayerAttack;
 
         //animation placeholder
         await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
+        await JS.InvokeVoidAsync("playSound", "sounds/swordslash2.mp3");
         await DrawScene();
 
         if (GameState.CurrentEnemy.Hp <= 0)
         {
             await Task.Delay(1100);
             GameState.PlayerExp += GameState.CurrentEnemy.Xp;
+            if(GameState.PlayerExp >= 10)
+            {
+                GameState.PlayerLvl++;
+                GameState.PlayerExp -= 10;
+                await JS.InvokeVoidAsync("playSound", "sounds/levelup.mp3");
+                showLevelUp = true;
+
+            }
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
             await EndCombatAndSave();
-            
+
             await InvokeAsync(StateHasChanged);
             await DrawScene();
             return;
@@ -282,14 +390,16 @@ else
     private async Task EnemyTurn()
     {
         //enemy animation
+        await Task.Delay(1200);
         await JS.InvokeVoidAsync("combatCanvas.eAttackAnimation");
+        await JS.InvokeVoidAsync("playSound", "sounds/hurt.wav");
         GameState.PlayerHealth -= GameState.CurrentEnemy.Atk;
         if(GameState.PlayerHealth <= 0)
         {
-
+            GameState.PlayerDeath();
             await EndCombatAndSave();
             await InvokeAsync(StateHasChanged);
-            GameState.PlayerHealth = 100; //restores health after dying  temp
+            
 
         }
     }
@@ -330,5 +440,19 @@ else
         {
             SaveService.LoadSave(save, GameState);
         }
+    }
+
+
+    private void ChooseAttack()
+    {
+        GameState.PlayerAttack += 1;
+        showLevelUp = false;
+    }
+
+    private void ChooseHealth()
+    {
+        GameState.PlayerMaxHealth += 5;
+        GameState.PlayerHealth += 5;
+        showLevelUp = false;
     }
 }
