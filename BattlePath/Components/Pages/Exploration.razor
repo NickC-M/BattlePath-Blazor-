@@ -289,6 +289,7 @@ else
 
 @code {
     private bool showDeathOverlay = false;
+    private bool animationPlaying = false;
     private bool showLevelUp = false;
     private DotNetObjectReference<Exploration>? objRef;
     private Random rng = new Random();
@@ -406,10 +407,12 @@ else
 
     private async Task Attack()
     {
+        if (animationPlaying) return; //if animation is playing cancel input
         if (showLevelUp) return;
         GameState.CurrentEnemy.Hp -= GameState.PlayerAttack;
 
         //attack animation 
+        animationPlaying = true;
         await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
         await JS.InvokeVoidAsync("playSound", "sounds/swordslash2.mp3");
         await DrawScene();
@@ -428,14 +431,14 @@ else
             }
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
             await EndCombatAndSave();
-
+            animationPlaying = false;
             await InvokeAsync(StateHasChanged);
             await DrawScene();
             return;
         }
 
         await EnemyTurn();
-
+        animationPlaying = false;
         await DrawScene();
     }
 
