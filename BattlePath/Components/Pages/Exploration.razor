@@ -159,15 +159,19 @@
                     
                     <div>Floor: @GameState.depth</div>
                 </div>
+
+
             </div>
+
+                            <p>Use buttons or WASD keys to move the player:</p>
+                <div>
+                    <button @onclick="() => Move(0, -1)">Up (W)</button>
+                    <button @onclick="() => Move(-1, 0)">Left (A)</button>
+                    <button @onclick="() => Move(1, 0)">Right (D)</button>
+                    <button @onclick="() => Move(0, 1)">Down (S)</button>
+                </div>
     </div>
-    <p>Use buttons or WASD keys to move the player:</p>
-    <div>
-        <button @onclick="() => Move(0, -1)">Up (W)</button>
-        <button @onclick="() => Move(-1, 0)">Left (A)</button>
-        <button @onclick="() => Move(1, 0)">Right (D)</button>
-        <button @onclick="() => Move(0, 1)">Down (S)</button>
-    </div>
+    
 
 
 
