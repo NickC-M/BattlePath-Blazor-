@@ -61,7 +61,7 @@ namespace BattlePath.Services
                 if ((ex != PlayerX || ey != PlayerY) &&
                     !Enemies.Any(e => e.X == ex && e.Y == ey))
                 {
-                    int n = rng.Next(3);
+                    int n = rng.Next(3); //rng to pick which enemy
                     if(depth < 3) Enemies.Add(new Enemy(i,ex, ey, "Goblin", 30, 5, "images/goblin.png",4));
 
                     else if (n == 0)
@@ -142,9 +142,9 @@ namespace BattlePath.Services
             foreach(Position e in Enemies)
             {
 
-                int space = Math.Abs(e.X - PlayerX) + Math.Abs(e.Y - PlayerY);
+                int space = Math.Abs(e.X - PlayerX) + Math.Abs(e.Y - PlayerY); //calculates how close enemy is to player in grid
 
-                if (space < 4)
+                if (space < 4) //if enemy is close move closer
                 {
                     int dx = PlayerX - e.X;
                     int dy = PlayerY - e.Y;
@@ -170,6 +170,7 @@ namespace BattlePath.Services
 
         }
 
+        //Collosion detection
         public bool IsEnemyHere() => Enemies.Any(e => e.X == PlayerX && e.Y == PlayerY);
         public bool IsEnemyHere(Position en) => Enemies.Any(e => e.X == en.X && e.Y == en.Y);
         public bool IsExitHere() => PlayerX == Exit.X && PlayerY == Exit.Y;
@@ -182,6 +183,8 @@ namespace BattlePath.Services
         {
             return (IsEnemyHere(p) || IsExitHere(p) || IsPlayerHere(p) || IsWaterHere(p));
         }
+
+        //sets current enemy and triggers UI change
         public void StartCombat()
         {
             CurrentEnemy = Enemies.FirstOrDefault(e => e.X == PlayerX && e.Y == PlayerY);
@@ -189,7 +192,7 @@ namespace BattlePath.Services
             InCombat = true;
         }
 
-
+        //triggers UI change
         public void EndCombat()
         {
             
@@ -199,12 +202,13 @@ namespace BattlePath.Services
 
         public void PlayerDeath()
         {
-            for(int i = 0; i < PlayerLvl / 10; i++)
+            while(PlayerLvl >= 10)
             {
                 PlayerLvl -= 10;
-                PlayerPerma++;
+                PlayerPerma++;  //player gains permanent stats for every 10 levels they had on death
             }
            
+            //reset game state values so game is fresh
             depth = 0;
             PlayerExp = 0;
             PlayerLvl = 0;

@@ -173,7 +173,7 @@
         a.timer = 0;
         a.x = 200;
 
-        //impact
+       
     
 
     },
@@ -182,21 +182,21 @@
         const s = this.state;
         let t = 0;
         
-            const anim = setInterval(() => {
+        const anim = setInterval(() => {
 
-                t += 0.05;
-                s.enemyOffsetX = -200 * Math.sin(t * Math.PI);
+            t += 0.05;
+            s.enemyOffsetX = -200 * Math.sin(t * Math.PI);
 
-                if (t >= 1) {
-                    s.enemyOffsetX = 0;
-                    clearInterval(anim);
-                }
+            if (t >= 1) {
+                s.enemyOffsetX = 0;
+                clearInterval(anim);
+            }
 
-            }, 16);
-            setTimeout(() => {
-                s.flash = 0.6;
-                s.shake = 10;
-            }, 120);
+        }, 16);
+        setTimeout(() => {
+            s.flash = 0.6;
+            s.shake = 10;
+        }, 120);
         
         
         

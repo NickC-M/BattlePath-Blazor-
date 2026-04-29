@@ -125,17 +125,17 @@
         <h2 style=" text-align: left">Exploration  </h2>
         <h2 style=" text-align: right">Floor: <span class="badge badge-warning">@GameState.depth</span></h2>
     </div>
-    //<canvas id="exploreBackCanvas" width="1200" height="1200" style="border:2px solid black;"></canvas>
-    //exploration canvas
+    
+    //exploration canvas (left side)
     <div style="display: flex; gap: 20px; align-items: flex-start;">
 
         <div>
     <canvas id="exploreCanvas" width="800" height="800" style="border:2px solid black;"></canvas>
         </div>
-     <!-- RIGHT: HUD PANEL -->
+     <!-- right side of UI -->
         <div style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
 
-            <!-- PLAYER PANEL -->
+            <!-- player panel -->
             <div class="card p-2">
                 <h5>Player</h5>
 
@@ -186,16 +186,16 @@ else
     //combat GUI
     <div style="display: flex; gap: 20px; align-items: flex-start;">
 
-        <!-- LEFT: COMBAT CANVAS -->
+        <!-- combat canvas (left side) -->
         <div>
             <canvas id="combatCanvas" width="1200" height="720" style="border:1px solid black;"></canvas>
 
         </div>
 
-        <!-- RIGHT: HUD PANEL -->
+        <!-- right side of UI -->
         <div style="width: 300px; display: flex; flex-direction: column; gap: 20px;">
 
-            <!-- PLAYER PANEL -->
+            <!-- player panel -->
             <div class="card p-2">
                 <h5>Player</h5>
 
@@ -220,7 +220,7 @@ else
                 </div>
             </div>
 
-            <!-- ENEMY PANEL -->
+            <!-- enemy panel -->
             <div class="card p-2">
                 <h5>@GameState.CurrentEnemy.Name</h5>
                 <div class="progress" style="height: 20px;">
@@ -317,7 +317,7 @@ else
         }
     }
 
-    [JSInvokable]
+    [JSInvokable] //can be called from explore canvas with ref obj
     public async Task Move(int dx, int dy)
     {
         if (showLevelUp) return;
@@ -409,7 +409,7 @@ else
         if (showLevelUp) return;
         GameState.CurrentEnemy.Hp -= GameState.PlayerAttack;
 
-        //animation placeholder
+        //attack animation 
         await JS.InvokeVoidAsync("combatCanvas.attackAnimation");
         await JS.InvokeVoidAsync("playSound", "sounds/swordslash2.mp3");
         await DrawScene();
@@ -418,12 +418,12 @@ else
         {
             await Task.Delay(1100);
             GameState.PlayerExp += GameState.CurrentEnemy.Xp;
-            if(GameState.PlayerExp >= 10)
+            if(GameState.PlayerExp >= 10) //level up check
             {
                 GameState.PlayerLvl++;
                 GameState.PlayerExp -= 10;
                 await JS.InvokeVoidAsync("playSound", "sounds/levelup.mp3");
-                showLevelUp = true;
+                showLevelUp = true; //triggers overlay to show
 
             }
             GameState.Enemies.RemoveAll(e => e.X == GameState.PlayerX && e.Y == GameState.PlayerY);
@@ -469,7 +469,8 @@ else
 
         }
     }
-
+    //uses method from SaveService to create a save from the GameStateService
+    // and assign that save to the current user
     private async Task SaveGame()
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
@@ -479,7 +480,7 @@ else
 
         var save = SaveService.CreateSave(GameState);
 
-        user.SaveDataJson = JsonSerializer.Serialize(save);
+        user.SaveDataJson = JsonSerializer.Serialize(save); //save data is stored as Json
 
         await UserManager.UpdateAsync(user);
     }
@@ -490,7 +491,9 @@ else
         await SaveGame();
     }
 
-    private async Task LoadGame()
+    //takes Json Save in from current user and deserializes it and then uses load method
+    // from SaveService to build saved game state
+    private async Task LoadGame() 
     {
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         var user = await UserManager.GetUserAsync(authState.User);
@@ -509,20 +512,20 @@ else
     }
 
 
-    private void ChooseAttack()
+    private void ChooseAttack() //upgrade attack
     {
         GameState.PlayerAttack += 1;
         showLevelUp = false;
     }
 
-    private void ChooseHealth()
+    private void ChooseHealth() //upgrade health
     {
         GameState.PlayerMaxHealth += 5;
         GameState.PlayerHealth += 5;
         showLevelUp = false;
     }
 
-    private async Task Respawn()
+    private async Task Respawn() //disables death overlay
     {
         showDeathOverlay = false;
         await JS.InvokeVoidAsync("playSound", "sounds/good.wav");

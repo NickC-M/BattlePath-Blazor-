@@ -11,7 +11,7 @@ window.exploreCanvas = {
     init: function () {
         if (this.ready) return;
 
-        //cave tile
+        //field tile
         this.tile = new Image();
         this.tile.src = 'images/tile3.png';
 
@@ -27,7 +27,7 @@ window.exploreCanvas = {
         this.exitImg = new Image();
         this.exitImg.src = 'images/tower.png';
 
-        //water tile img
+        //water tile img (waters turned into bushes!!)
         this.waterImg = new Image();
         this.waterImg.src = 'images/bush.png'
 
@@ -129,7 +129,7 @@ window.exploreControls = {
 
             let dx = 0, dy = 0;
 
-            switch (e.key.toLowerCase()) {
+            switch (e.key.toLowerCase()) { //uses wasd or arrow keys for player movement
                 case 'w':
                 case 'arrowup':
                     dy = -1;
